@@ -14,8 +14,24 @@ None yet
 
 - Section
 - Section Nesting
+  ```ini
+  [Section]
+  key=value
+    [SubSection1]
+    key=value
+    [SubSection2]
+    key=value
+  ```
 - Comments (# ;)
 - Global Properties (http://commons.apache.org/proper/commons-configuration/apidocs/org/apache/commons/configuration2/INIConfiguration.html)
+
+  ```ini
+  globalkey=value
+
+  [section]
+  sctionkey=value
+  ```
+
 - Multi-line
 - Read from file
 - Write to file
