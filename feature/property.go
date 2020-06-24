@@ -3,13 +3,27 @@ package feature
 import (
 	"errors"
 	"fmt"
+	"log"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
 type Property struct {
 	Key   string
-	Value string
+	value string
+}
+
+func (p Property) String() string {
+	return p.value
+}
+
+func (p Property) Bool() bool {
+	value, err := strconv.ParseBool(p.value)
+	if err != nil {
+		log.Printf("Key: \"%s\" with Value: \"%s\" can not be read as a boolean\n", p.Key, p.value)
+	}
+	return value
 }
 
 func IsProperty(line string) bool {
@@ -40,7 +54,7 @@ func GetProperty(line string) (*Property, error) {
 	property.Key = strings.TrimSpace(split[0])
 
 	trimmedValue := strings.TrimSpace(split[1])
-	property.Value = strings.TrimSuffix(strings.TrimPrefix(trimmedValue, "\""), "\"")
+	property.value = strings.TrimSuffix(strings.TrimPrefix(trimmedValue, "\""), "\"")
 
 	return property, nil
 }

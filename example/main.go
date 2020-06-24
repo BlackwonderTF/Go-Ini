@@ -8,5 +8,6 @@ import (
 
 func main() {
 	log.Println("Reading file")
-	ini.Parse("example/test")
+	iniFile := ini.Load("test")
+	log.Println(iniFile.Section("Owner").GetProperty("Dead").Bool())
 }

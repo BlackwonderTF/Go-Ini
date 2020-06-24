@@ -1,18 +1,22 @@
 # Go-Ini
 
-Mostly based on [this](https://en.wikipedia.org/wiki/INI_file) WikiPedia article.
+This implementation is based on these articles:
+- [WikiPedia](https://en.wikipedia.org/wiki/INI_file) 
+- [Apache](http://commons.apache.org/proper/commons-configuration/apidocs/org/apache/commons/configuration2/INIConfiguration.html).
 
 ## Features
 
-None yet
+- Section
+- Global Properties
+- Read from file
 
 ## Supported value types
 
-None yet
+- String
+- Bool
 
 ## Planned Features
 
-- Section
 - Section Nesting
   ```ini
   [Section]
@@ -22,9 +26,7 @@ None yet
     [SubSection2]
     key=value
   ```
-- Comments (# ;)
-- Global Properties (http://commons.apache.org/proper/commons-configuration/apidocs/org/apache/commons/configuration2/INIConfiguration.html)
-
+- Comments above line and in-line (#) (;)
   ```ini
   globalkey=value
 
@@ -33,13 +35,12 @@ None yet
   ```
 
 - Multi-line
-- Read from file
+- Multiple seperators (passwd : abc=def) (a:b = "value")
 - Write to file
+- Configuration options for features with multiple implementations (like sub-sections)
 
 ## Planned Supported value types
 
-- String
-- Bool
 - Int (0-64)
 - Uint (0-64)
 - Array (Types above)

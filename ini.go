@@ -5,22 +5,37 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/BlackwonderTF/go-ini/feature"
 )
 
 type File struct {
-	Sections []feature.Section
+	items    []feature.Feature
+	sections map[string]*feature.Section
+	globals  map[string]*feature.Property
 }
 
-func Parse(filePath string) {
+func createFile() File {
+	return File{
+		items:    make([]feature.Feature, 0),
+		sections: make(map[string]*feature.Section),
+		globals:  make(map[string]*feature.Property),
+	}
+}
+
+func (f File) Section(section string) feature.Section {
+	return *f.sections[strings.ToLower(section)]
+}
+
+func Load(filePath string) *File {
 	currentDir, err := os.Getwd()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	file, err := os.Open(fmt.Sprintf("%s\\%s.ini", currentDir, filePath))
+	file, err := os.Open(fmt.Sprintf("%s/%s.ini", currentDir, filePath))
 
 	if err != nil {
 		log.Fatal(err)
@@ -28,37 +43,41 @@ func Parse(filePath string) {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
+	iniFile := readFile(scanner, createFile())
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return iniFile
+}
+
+func readFile(scanner *bufio.Scanner, iniFile File) *File {
+	var currentSection *feature.Section
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		if feature.IsComment(line) {
-			log.Printf("Comment: %s\n", line)
-			continue
-		}
-
 		if feature.IsSection(line) {
-			// Handle section stuff
-			// Check if within other section
-			log.Printf("Section: %s\n", line)
-			continue
-		}
+			currentSection = feature.CreateSection()
+			currentSection.Name = feature.GetSectionName(line)
 
-		if feature.IsProperty(line) {
-			// Handle property stuff
-			// Check if global
+			iniFile.items = append(iniFile.items, currentSection)
+			iniFile.sections[strings.ToLower(currentSection.Name)] = currentSection
+		} else if feature.IsProperty(line) {
 			property, err := feature.GetProperty(line)
 
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			log.Printf("Property: %s:%s\n", property.Key, property.Value)
-			continue
+			iniFile.items = append(iniFile.items, property)
+			if currentSection == nil {
+				iniFile.globals[strings.ToLower(property.Key)] = property
+			} else {
+				currentSection.AddProperty(property)
+			}
 		}
-
 	}
 
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
+	return &iniFile
 }
