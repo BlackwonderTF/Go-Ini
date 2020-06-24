@@ -14,6 +14,8 @@ This implementation is based on these articles:
 
 - String
 - Bool
+- Int (0-64)
+- Uint (0-64)
 
 ## Planned Features
 
@@ -42,6 +44,4 @@ This implementation is based on these articles:
 
 ## Planned Supported value types
 
-- Int (0-64)
-- Uint (0-64)
 - Array (Types above)

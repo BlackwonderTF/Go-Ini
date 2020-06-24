@@ -9,5 +9,5 @@ import (
 func main() {
 	log.Println("Reading file")
 	iniFile := ini.Load("test")
-	log.Println(iniFile.Section("Owner").GetProperty("Dead").Bool())
+	log.Println(iniFile.Section("Database").GetProperty("Port").Int64())
 }
