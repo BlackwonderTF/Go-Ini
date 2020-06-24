@@ -27,12 +27,12 @@ This implementation is based on these articles:
     [SubSection2]
     key=value
     
-    [Section]
-    key=value
-    [Section.SubSection1]
-    key=value
-    [Section.SubSection2]
-    key=value
+  [Section]
+  key=value
+  [Section.SubSection1]
+  key=value
+  [Section.SubSection2]
+  key=value
   ```
 - Comments above line and in-line (#) (;)
   ```ini
