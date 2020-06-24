@@ -2,7 +2,7 @@
 
 This implementation is based on these articles:
 - [WikiPedia](https://en.wikipedia.org/wiki/INI_file) 
-- [Apache](http://commons.apache.org/proper/commons-configuration/apidocs/org/apache/commons/configuration2/INIConfiguration.html).
+- [Apache](http://commons.apache.org/proper/commons-configuration/apidocs/org/apache/commons/configuration2/INIConfiguration.html)
 
 ## Features
 
@@ -23,7 +23,15 @@ This implementation is based on these articles:
   key=value
     [SubSection1]
     key=value
+    
     [SubSection2]
+    key=value
+    
+    [Section]
+    key=value
+    [Section.SubSection1]
+    key=value
+    [Section.SubSection2]
     key=value
   ```
 - Comments above line and in-line (#) (;)
