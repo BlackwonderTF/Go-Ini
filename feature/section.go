@@ -19,8 +19,7 @@ func GetSectionName(line string) string {
 
 func CreateSection() *Section {
 	return &Section{
-		values:      make(map[string]*Property),
-		subsections: make(map[string]Section),
+		values: make(map[string]*Property),
 	}
 }
 
