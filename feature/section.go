@@ -5,9 +5,8 @@ import (
 )
 
 type Section struct {
-	Name        string
-	values      map[string]*Property
-	subsections map[string]Section
+	Name   string
+	values map[string]*Property
 }
 
 func IsSection(line string) bool {

@@ -35,13 +35,6 @@ This implementation is based on these articles:
   key=value
   ```
 - Comments above line and in-line (#) (;)
-  ```ini
-  globalkey=value
-
-  [section]
-  sctionkey=value
-  ```
-
 - Multi-line
 - Multiple seperators (passwd : abc=def) (a:b = "value")
 - Write to file
