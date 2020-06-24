@@ -16,3 +16,15 @@ func RegSplit(text string, delimeter string) []string {
 	result[len(indexes)] = text[laststart:]
 	return result
 }
+
+func RegSplitFirst(text string, delimeter string) []string {
+	reg := regexp.MustCompile(delimeter)
+	index := reg.FindStringIndex(text)
+	result := make([]string, 3)
+
+	result[0] = text[:index[0]]
+	result[1] = text[index[0]:index[1]]
+	result[2] = text[index[1]:]
+
+	return result
+}

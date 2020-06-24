@@ -1,17 +1,55 @@
 package feature
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/BlackwonderTF/go-ini/utils"
 )
 
 type Property struct {
-	Key   string
-	value string
+	Key       string
+	value     string
+	seperator string
+}
+
+func IsProperty(line string) bool {
+	// regex := regexp.MustCompile("^([a-zA-Z]+[a-zA-Z0-9]*\\s*)=(\\s*[^=]*([^=]*\\=[^=]*)*)$")
+
+	keyRegex := "([a-zA-Z]+[a-zA-Z0-9]*\\s*)"
+	separatorRegex := "([=:])"
+	valueRegex := "(.+)"
+
+	regex := regexp.MustCompile(fmt.Sprintf("^%s%s%s$", keyRegex, separatorRegex, valueRegex))
+	return regex.MatchString(line)
+}
+
+func GetProperty(line string) (*Property, error) {
+	if !IsProperty(line) {
+		return nil, fmt.Errorf("\"%s\" is not a property", line)
+	}
+
+	property := new(Property)
+
+	// Handle the split
+	split := utils.RegSplitFirst(line, "[=:]")
+	if len(split) <= 2 {
+		return nil, fmt.Errorf("\"%s\" is not a valid property", line)
+	}
+
+	property.seperator = split[1]
+	split[1] = strings.Join(split[2:], " ")
+	split = split[:2]
+
+	property.Key = strings.TrimSpace(split[0])
+
+	trimmedValue := strings.TrimSpace(split[1])
+	property.value = strings.TrimSuffix(strings.TrimPrefix(trimmedValue, "\""), "\"")
+
+	return property, nil
 }
 
 func (p Property) String() string {
@@ -104,37 +142,4 @@ func (p Property) UInt64() uint64 {
 		log.Printf("Key: \"%s\" with Value: \"%s\" can not be read as a 64 bit unsigned integer\n", p.Key, p.value)
 	}
 	return uint64(value)
-}
-
-func IsProperty(line string) bool {
-	regex := regexp.MustCompile("^([a-zA-Z]+[a-zA-Z0-9]*\\s*)=(\\s*[^=]*([^=]*\\=[^=]*)*)$")
-	return regex.MatchString(line)
-}
-
-func GetProperty(line string) (*Property, error) {
-	if !IsProperty(line) {
-		return nil, fmt.Errorf("\"%s\" is not a property", line)
-	}
-
-	split := strings.Split(line, "=")
-	if len(split) <= 1 {
-		// TODO improve this
-		return nil, errors.New("Property is not valid error")
-	} else if len(split) > 2 {
-		for i, arg := range split {
-			if strings.HasSuffix(arg, "\\") {
-				split[i] = arg[:len(arg)-1]
-			}
-		}
-		split[1] = strings.Join(split[1:], " ")
-	}
-
-	property := new(Property)
-
-	property.Key = strings.TrimSpace(split[0])
-
-	trimmedValue := strings.TrimSpace(split[1])
-	property.value = strings.TrimSuffix(strings.TrimPrefix(trimmedValue, "\""), "\"")
-
-	return property, nil
 }

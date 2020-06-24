@@ -1,6 +1,7 @@
 package feature
 
 import (
+	"log"
 	"strings"
 )
 
@@ -29,5 +30,11 @@ func (s *Section) AddProperty(property *Property) {
 }
 
 func (s Section) GetProperty(key string) *Property {
-	return s.values[strings.ToLower(key)]
+	property := s.values[strings.ToLower(key)]
+
+	if property == nil {
+		log.Fatalf("Property \"%s\" on section \"%s\" does not exist", key, s.Name)
+	}
+
+	return property
 }

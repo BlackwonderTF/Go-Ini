@@ -9,6 +9,7 @@ This implementation is based on these articles:
 - Section
 - Global Properties
 - Read from file
+- Multiple seperators [":", "="]
 
 ## Supported value types
 
@@ -38,7 +39,6 @@ This implementation is based on these articles:
   ```
 - Comments above line and in-line (#) (;)
 - Multi-line
-- Multiple seperators (passwd : abc=def) (a:b = "value")
 - Write to file
 - Configuration options for features with multiple implementations (like sub-sections)
 
