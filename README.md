@@ -10,13 +10,14 @@ This implementation is based on these articles:
 - Global Properties
 - Read from file
 - Multiple seperators [":", "="]
+- Comments above line and in-line (#) (;)
 
 ## Supported value types
 
 - String
 - Bool
-- Int (0-64)
-- Uint (0-64)
+- Int (0, 8, 16, 32, 64)
+- Uint (0, 8, 16, 32, 64)
 
 ## Planned Features
 
@@ -37,7 +38,6 @@ This implementation is based on these articles:
   [Section.SubSection2]
   key=value
   ```
-- Comments above line and in-line (#) (;)
 - Multi-line
 - Write to file
 - Configuration options for features with multiple implementations (like sub-sections)

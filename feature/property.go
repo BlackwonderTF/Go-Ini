@@ -11,19 +11,18 @@ import (
 )
 
 type Property struct {
-	Key       string
-	value     string
-	seperator string
+	Key         string
+	value       string
+	seperator   string
+	comment     *string
+	commentChar *string
 }
 
 func IsProperty(line string) bool {
-	// regex := regexp.MustCompile("^([a-zA-Z]+[a-zA-Z0-9]*\\s*)=(\\s*[^=]*([^=]*\\=[^=]*)*)$")
-
 	keyRegex := "([a-zA-Z]+[a-zA-Z0-9]*\\s*)"
-	separatorRegex := "([=:])"
 	valueRegex := "(.+)"
 
-	regex := regexp.MustCompile(fmt.Sprintf("^%s%s%s$", keyRegex, separatorRegex, valueRegex))
+	regex := regexp.MustCompile(fmt.Sprintf("^%s%s%s$", keyRegex, GetSeperatorRegex(), valueRegex))
 	return regex.MatchString(line)
 }
 
@@ -35,8 +34,10 @@ func GetProperty(line string) (*Property, error) {
 	property := new(Property)
 
 	// Handle the split
-	split := utils.RegSplitFirst(line, "[=:]")
-	if len(split) <= 2 {
+	split, err := utils.RegSplitFirst(line, GetSeperatorRegex())
+	if err != nil {
+		return nil, err
+	} else if len(split) <= 2 {
 		return nil, fmt.Errorf("\"%s\" is not a valid property", line)
 	}
 
@@ -47,7 +48,18 @@ func GetProperty(line string) (*Property, error) {
 	property.Key = strings.TrimSpace(split[0])
 
 	trimmedValue := strings.TrimSpace(split[1])
-	property.value = strings.TrimSuffix(strings.TrimPrefix(trimmedValue, "\""), "\"")
+	quotesRegex := GetQuotesRegex()
+	commentRegex, err := utils.RegSplitFirst(trimmedValue, fmt.Sprintf("(%s?.+%s?)(%s)", quotesRegex, quotesRegex, GetCommentsRegex()))
+
+	value := trimmedValue
+
+	if commentRegex != nil {
+		property.comment = utils.CreateStringPointer(strings.TrimSpace(commentRegex[2]))
+		property.commentChar = utils.CreateStringPointer(commentRegex[1][len(commentRegex[1])-1:])
+		value = strings.TrimSpace(commentRegex[1][:len(commentRegex[1])-1])
+	}
+
+	property.value = removeQuotes(value)
 
 	return property, nil
 }
