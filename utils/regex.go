@@ -34,3 +34,8 @@ func RegSplitFirst(text string, delimeter string) ([]string, error) {
 
 	return result, nil
 }
+
+func Match(text string, delimeter string) string {
+	reg := regexp.MustCompile(delimeter)
+	return reg.FindString(text)
+}

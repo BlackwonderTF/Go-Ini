@@ -23,22 +23,21 @@ func IsProperty(line string) bool {
 	valueRegex := "(.+)"
 
 	regex := regexp.MustCompile(fmt.Sprintf("^%s%s%s$", keyRegex, GetSeperatorRegex(), valueRegex))
-	return regex.MatchString(line)
+	return regex.MatchString(strings.TrimSpace(line))
 }
 
-func GetProperty(line string) (*Property, error) {
+func GetProperty(line string) (Property, error) {
+	var property Property
 	if !IsProperty(line) {
-		return nil, fmt.Errorf("\"%s\" is not a property", line)
+		return property, fmt.Errorf("\"%s\" is not a property", line)
 	}
-
-	property := new(Property)
 
 	// Handle the split
 	split, err := utils.RegSplitFirst(line, GetSeperatorRegex())
 	if err != nil {
-		return nil, err
+		return property, err
 	} else if len(split) <= 2 {
-		return nil, fmt.Errorf("\"%s\" is not a valid property", line)
+		return property, fmt.Errorf("\"%s\" is not a valid property", line)
 	}
 
 	property.seperator = split[1]

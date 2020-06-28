@@ -1,31 +1,23 @@
 package ini
 
 import (
-	"bufio"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/BlackwonderTF/go-ini/feature"
+	"github.com/BlackwonderTF/go-ini/utils"
 )
 
 type File struct {
-	items    []feature.Feature
-	sections map[string]*feature.Section
-	globals  map[string]*feature.Property
+	feature.Section
 }
 
 func createFile() File {
 	return File{
-		items:    make([]feature.Feature, 0),
-		sections: make(map[string]*feature.Section),
-		globals:  make(map[string]*feature.Property),
+		Section: *feature.CreateSection("", nil),
 	}
-}
-
-func (f File) Section(section string) feature.Section {
-	return *f.sections[strings.ToLower(section)]
 }
 
 func Load(filePath string) *File {
@@ -35,49 +27,68 @@ func Load(filePath string) *File {
 		log.Fatal(err)
 	}
 
-	file, err := os.Open(fmt.Sprintf("%s/%s.ini", currentDir, filePath))
-
+	content, err := ioutil.ReadFile(fmt.Sprintf("%s/%s.ini", currentDir, filePath))
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	iniFile := readFile(scanner, createFile())
+	text := utils.RegSplit(string(content), "[\\n\\r]+")
 
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
+	iniFile := readFile(text)
 
 	return iniFile
 }
 
-func readFile(scanner *bufio.Scanner, iniFile File) *File {
-	var currentSection *feature.Section
-	for scanner.Scan() {
-		line := scanner.Text()
+func readFile(content []string) *File {
+	iniFile := new(File)
 
-		if feature.IsSection(line) {
-			currentSection = feature.CreateSection()
-			currentSection.Name = feature.GetSectionName(line)
+	readSection(&iniFile.Section, content, 0)
 
-			iniFile.items = append(iniFile.items, currentSection)
-			iniFile.sections[strings.ToLower(currentSection.Name)] = currentSection
-		} else if feature.IsProperty(line) {
-			property, err := feature.GetProperty(line)
+	return iniFile
+}
 
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			iniFile.items = append(iniFile.items, property)
-			if currentSection == nil {
-				iniFile.globals[strings.ToLower(property.Key)] = property
-			} else {
-				currentSection.AddProperty(property)
-			}
-		}
+func readSection(currentSection *feature.Section, file []string, index int) int {
+	var parent *feature.Section
+	if currentSection.Parent == nil {
+		parent = currentSection
+	} else {
+		parent = currentSection.Parent
 	}
 
-	return &iniFile
+	for len(file) > index {
+		line := file[index]
+		if feature.IsSection(line) {
+			var section *feature.Section
+			prefix := len(feature.GetFeaturePrefix(line))
+			if prefix > len(currentSection.Prefix) {
+				section = feature.CreateSection(line, currentSection)
+				index = readSection(section, file, index+1) - 1
+			} else if prefix < len(currentSection.Prefix) {
+				return index
+			} else {
+				section = feature.CreateSection(line, parent)
+				currentSection = section
+			}
+		} else if feature.IsProperty(line) {
+			prefix := feature.GetFeaturePrefix(line)
+			if currentSection.Prefix != prefix {
+				return index
+			}
+
+			property := readProperty(line)
+			currentSection.AddProperty(&property)
+		}
+		index++
+	}
+	return index
+}
+
+func readProperty(line string) feature.Property {
+	property, err := feature.GetProperty(line)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return property
 }

@@ -11,6 +11,7 @@ This implementation is based on these articles:
 - Read from file
 - Multiple seperators [":", "="]
 - Comments above line and in-line (#) (;)
+- Section Nesting
 
 ## Supported value types
 
@@ -21,27 +22,10 @@ This implementation is based on these articles:
 
 ## Planned Features
 
-- Section Nesting
-  ```ini
-  [Section]
-  key=value
-    [SubSection1]
-    key=value
-    
-    [SubSection2]
-    key=value
-    
-  [Section]
-  key=value
-  [Section.SubSection1]
-  key=value
-  [Section.SubSection2]
-  key=value
-  ```
-- Multi-line
 - Write to file
 - Configuration options for features with multiple implementations (like sub-sections)
 
 ## Planned Supported value types
 
 - Array (Types above)
+- Multi-line String / Array
