@@ -13,22 +13,12 @@ type Section struct {
 	sections   map[string]*Section
 }
 
-func IsSection(line string) bool {
-	line = strings.TrimSpace(line)
-	return strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]")
-}
-
-func CreateSection(line string, parent *Section) *Section {
-	section := Section{
-		Name:   strings.TrimSuffix(strings.TrimPrefix(strings.TrimSpace(line), "["), "]"),
-		Prefix: GetFeaturePrefix(line),
+func CreateSection(name string) Section {
+	s := Section{
+		Name: name,
 	}
 
-	if parent != nil {
-		parent.AddSection(&section)
-	}
-
-	return &section
+	return s
 }
 
 func (s *Section) AddProperty(property *Property) {

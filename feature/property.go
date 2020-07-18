@@ -1,13 +1,10 @@
 package feature
 
 import (
-	"fmt"
 	"log"
-	"regexp"
 	"strconv"
-	"strings"
 
-	"github.com/BlackwonderTF/go-ini/utils"
+	"github.com/BlackwonderTF/go-ini/config"
 )
 
 type Property struct {
@@ -18,49 +15,40 @@ type Property struct {
 	commentChar *string
 }
 
-func IsProperty(line string) bool {
-	keyRegex := "([a-zA-Z]+[a-zA-Z0-9]*\\s*)"
-	valueRegex := "(.+)"
+func CreateProperty(key string, value string, seperator string) Property {
+	if seperator == "" {
+		seperator = config.GetDefaultSeperator()
+	}
 
-	regex := regexp.MustCompile(fmt.Sprintf("^%s%s%s$", keyRegex, GetSeperatorRegex(), valueRegex))
-	return regex.MatchString(strings.TrimSpace(line))
+	property := Property{
+		Key:   key,
+		value: value,
+	}
+
+	return property
 }
 
-func GetProperty(line string) (Property, error) {
-	var property Property
-	if !IsProperty(line) {
-		return property, fmt.Errorf("\"%s\" is not a property", line)
+func (p *Property) SetValue(value string) *Property {
+	p.value = value
+	return p
+}
+
+func (p *Property) SetSeperator(seperator string) *Property {
+	p.seperator = seperator
+	return p
+}
+
+func (p *Property) SetComment(prefix string, comment string) *Property {
+	if p.comment == nil {
+		p.comment = new(string)
+	}
+	if p.commentChar == nil {
+		p.commentChar = new(string)
 	}
 
-	// Handle the split
-	split, err := utils.RegSplitFirst(line, GetSeperatorRegex())
-	if err != nil {
-		return property, err
-	} else if len(split) <= 2 {
-		return property, fmt.Errorf("\"%s\" is not a valid property", line)
-	}
-
-	property.seperator = split[1]
-	split[1] = strings.Join(split[2:], " ")
-	split = split[:2]
-
-	property.Key = strings.TrimSpace(split[0])
-
-	trimmedValue := strings.TrimSpace(split[1])
-	quotesRegex := GetQuotesRegex()
-	commentRegex, err := utils.RegSplitFirst(trimmedValue, fmt.Sprintf("(%s?.+%s?)(%s)", quotesRegex, quotesRegex, GetCommentsRegex()))
-
-	value := trimmedValue
-
-	if commentRegex != nil {
-		property.comment = utils.CreateStringPointer(strings.TrimSpace(commentRegex[2]))
-		property.commentChar = utils.CreateStringPointer(commentRegex[1][len(commentRegex[1])-1:])
-		value = strings.TrimSpace(commentRegex[1][:len(commentRegex[1])-1])
-	}
-
-	property.value = removeQuotes(value)
-
-	return property, nil
+	*p.comment = comment
+	*p.commentChar = prefix
+	return p
 }
 
 func (p Property) String() string {
