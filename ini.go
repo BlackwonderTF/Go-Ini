@@ -14,10 +14,9 @@ type File struct {
 	feature.Section
 }
 
-func createFile() File {
-	return File{
-		Section: *feature.CreateSection("", nil),
-	}
+func CreateFile() File {
+	f := File{}
+	return f
 }
 
 func Load(filePath string) *File {
@@ -40,11 +39,11 @@ func Load(filePath string) *File {
 }
 
 func readFile(content []string) *File {
-	iniFile := new(File)
+	iniFile := CreateFile()
 
 	readSection(&iniFile.Section, content, 0)
 
-	return iniFile
+	return &iniFile
 }
 
 func readSection(currentSection *feature.Section, file []string, index int) int {
@@ -57,20 +56,20 @@ func readSection(currentSection *feature.Section, file []string, index int) int 
 
 	for len(file) > index {
 		line := file[index]
-		if feature.IsSection(line) {
+		if isSection(line) {
 			var section *feature.Section
-			prefix := len(feature.GetFeaturePrefix(line))
+			prefix := len(getFeaturePrefix(line))
 			if prefix > len(currentSection.Prefix) {
-				section = feature.CreateSection(line, currentSection)
+				section = createSection(line, currentSection)
 				index = readSection(section, file, index+1) - 1
 			} else if prefix < len(currentSection.Prefix) {
 				return index
 			} else {
-				section = feature.CreateSection(line, parent)
+				section = createSection(line, parent)
 				currentSection = section
 			}
-		} else if feature.IsProperty(line) {
-			prefix := feature.GetFeaturePrefix(line)
+		} else if isProperty(line) {
+			prefix := getFeaturePrefix(line)
 			if currentSection.Prefix != prefix {
 				return index
 			}
@@ -84,7 +83,7 @@ func readSection(currentSection *feature.Section, file []string, index int) int 
 }
 
 func readProperty(line string) feature.Property {
-	property, err := feature.GetProperty(line)
+	property, err := getProperty(line)
 
 	if err != nil {
 		log.Fatal(err)
