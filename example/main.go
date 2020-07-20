@@ -13,6 +13,7 @@ func main() {
 	indented := ini.Load("indented", iniFile)
 
 	log.Println("======== Indented File ========")
+	log.Println(indented.GetProperty("key").String())
 	log.Println(indented.GetSection("Section").GetProperty("key").Int64())
 	log.Println(indented.GetSection("Section").GetSection("SubSection").GetProperty("key").String())
 	log.Println(indented.GetSection("Section").GetSection("SubSection2").GetProperty("key").String())
@@ -25,6 +26,7 @@ func main() {
 	iniFile.Config.SetSubSectionType(subsection.Seperated, ".")
 	seperated := ini.Load("seperated", iniFile)
 	log.Println("======== Seperated File ========")
+	log.Println(seperated.GetProperty("key").String())
 	log.Println(seperated.GetSection("Section").GetProperty("key").Int64())
 	log.Println(seperated.GetSection("Section").GetSection("SubSection").GetProperty("key").String())
 	log.Println(seperated.GetSection("Section").GetSection("SubSection2").GetProperty("key").String())
