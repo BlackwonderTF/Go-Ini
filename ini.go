@@ -13,26 +13,30 @@ import (
 	"github.com/shellucas/go-ini/utils"
 )
 
-type File struct {
+var Files map[string]*file = make(map[string]*file)
+
+type file struct {
 	feature.Section
 	Config config.Config
 }
 
-func CreateFile() File {
-	f := File{
+func CreateFile() file {
+	f := file{
 		Config: config.InitDefault(),
 	}
 	return f
 }
 
-func Load(filePath string, file File) *File {
+func Load(filePath string, file file) *file {
 	currentDir, err := os.Getwd()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	content, err := ioutil.ReadFile(fmt.Sprintf("%s/%s.ini", currentDir, filePath))
+	fileName := strings.TrimSuffix(filePath, ".ini")
+
+	content, err := ioutil.ReadFile(fmt.Sprintf("%s/%s.ini", currentDir, fileName))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,10 +45,13 @@ func Load(filePath string, file File) *File {
 
 	iniFile := readFile(text, file)
 
+	iniFile.Name = fileName
+	Files[fileName] = iniFile
+
 	return iniFile
 }
 
-func readFile(content []string, iniFile File) *File {
+func readFile(content []string, iniFile file) *file {
 	switch iniFile.Config.GetSubSectionType() {
 	case subsection.Indented:
 		readIndentedSection(&iniFile.Section, content, 0, iniFile.Config)

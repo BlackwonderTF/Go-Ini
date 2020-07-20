@@ -24,7 +24,8 @@ func main() {
 
 	iniFile = ini.CreateFile()
 	iniFile.Config.SetSubSectionType(subsection.Seperated, ".")
-	seperated := ini.Load("seperated", iniFile)
+	ini.Load("seperated.ini", iniFile)
+	seperated := ini.Files["seperated"]
 	log.Println("======== Seperated File ========")
 	log.Println(seperated.GetProperty("key").String())
 	log.Println(seperated.GetSection("Section").GetProperty("key").Int64())

@@ -24,6 +24,7 @@ This implementation is based on these articles:
 ## Planned Features
 
 - Write to file
+- Hot reload/write
 
 ## Planned Supported value types
 
