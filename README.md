@@ -12,6 +12,7 @@ This implementation is based on these articles:
 - Multiple seperators [":", "="]
 - Comments above line and in-line (#) (;)
 - Section Nesting
+- Configuration options for features with multiple implementations (like sub-sections)
 
 ## Supported value types
 
@@ -23,7 +24,6 @@ This implementation is based on these articles:
 ## Planned Features
 
 - Write to file
-- Configuration options for features with multiple implementations (like sub-sections)
 
 ## Planned Supported value types
 
