@@ -15,7 +15,7 @@ type Property struct {
 	commentChar *string
 }
 
-func CreateProperty(key string, value string, seperator string) Property {
+func CreateProperty(key string, value string, seperator string, config config.Config) Property {
 	if seperator == "" {
 		seperator = config.GetDefaultSeperator()
 	}
