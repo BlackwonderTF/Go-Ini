@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/BlackwonderTF/go-ini/config"
-	"github.com/BlackwonderTF/go-ini/enums/subsection"
-	"github.com/BlackwonderTF/go-ini/feature"
-	"github.com/BlackwonderTF/go-ini/utils"
+	"github.com/shellucas/go-ini/config"
+	"github.com/shellucas/go-ini/enums/subsection"
+	"github.com/shellucas/go-ini/feature"
+	"github.com/shellucas/go-ini/utils"
 )
 
 type File struct {

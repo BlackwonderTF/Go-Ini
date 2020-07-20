@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/BlackwonderTF/go-ini/enums/subsection"
-	"github.com/BlackwonderTF/go-ini/utils"
+	"github.com/shellucas/go-ini/enums/subsection"
+	"github.com/shellucas/go-ini/utils"
 )
 
 type Config struct {

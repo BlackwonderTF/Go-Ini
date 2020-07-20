@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/BlackwonderTF/go-ini"
-	"github.com/BlackwonderTF/go-ini/enums/subsection"
+	"github.com/shellucas/go-ini"
+	"github.com/shellucas/go-ini/enums/subsection"
 )
 
 func main() {

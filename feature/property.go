@@ -4,7 +4,7 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/BlackwonderTF/go-ini/config"
+	"github.com/shellucas/go-ini/config"
 )
 
 type Property struct {
