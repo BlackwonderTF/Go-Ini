@@ -27,16 +27,17 @@ func CreateFile() file {
 	return f
 }
 
-func Load(filePath string, file file) *file {
+func Load(path string, file file) *file {
 	currentDir, err := os.Getwd()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fileName := strings.TrimSuffix(filePath, ".ini")
+	filePath := utils.RegSplit(path, `[\\\/]`)
+	fileName := strings.TrimSuffix(filePath[len(filePath)-1], ".ini")
 
-	content, err := ioutil.ReadFile(fmt.Sprintf("%s/%s.ini", currentDir, fileName))
+	content, err := ioutil.ReadFile(fmt.Sprintf("%s/%s/%s.ini", currentDir, strings.Join(filePath[:len(filePath)-1], `/`), fileName))
 	if err != nil {
 		log.Fatal(err)
 	}
