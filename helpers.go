@@ -2,10 +2,12 @@ package ini
 
 import (
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 
 	"github.com/BlackwonderTF/go-ini/config"
+	"github.com/BlackwonderTF/go-ini/enums/subsection"
 	"github.com/BlackwonderTF/go-ini/feature"
 	"github.com/BlackwonderTF/go-ini/utils"
 )
@@ -15,7 +17,7 @@ func isSection(line string) bool {
 	return strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]")
 }
 
-func isProperty(line string) bool {
+func isProperty(line string, config config.Config) bool {
 	keyRegex := "([a-zA-Z]+[a-zA-Z0-9]*\\s*)"
 	valueRegex := "(.+)"
 
@@ -23,10 +25,11 @@ func isProperty(line string) bool {
 	return regex.MatchString(strings.TrimSpace(line))
 }
 
-func createSection(line string, parent *feature.Section) *feature.Section {
+func createSection(line string, parent *feature.Section, subType subsection.SubSectionType) *feature.Section {
+	prefix := getFeaturePrefix(line, subType)
 	section := feature.Section{
-		Name:   strings.TrimSuffix(strings.TrimPrefix(strings.TrimSpace(line), "["), "]"),
-		Prefix: getFeaturePrefix(line),
+		Name:   strings.TrimSuffix(strings.TrimPrefix(line[len(prefix)+1:], "["), "]"),
+		Prefix: prefix,
 	}
 
 	if parent != nil {
@@ -36,9 +39,9 @@ func createSection(line string, parent *feature.Section) *feature.Section {
 	return &section
 }
 
-func getProperty(line string) (feature.Property, error) {
+func getProperty(line string, config config.Config) (feature.Property, error) {
 	var property feature.Property
-	if !isProperty(line) {
+	if !isProperty(line, config) {
 		return property, fmt.Errorf("\"%s\" is not a property", line)
 	}
 
@@ -50,16 +53,15 @@ func getProperty(line string) (feature.Property, error) {
 		return property, fmt.Errorf("\"%s\" is not a valid property", line)
 	}
 
-	property.SetSeperator(split[1])
+	seperator := split[1]
 	split[1] = strings.Join(split[2:], " ")
 	split = split[:2]
-
-	property.Key = strings.TrimSpace(split[0])
 
 	trimmedValue := strings.TrimSpace(split[1])
 	quotesRegex := config.GetQuotesRegex()
 	commentRegex, err := utils.RegSplitFirst(trimmedValue, fmt.Sprintf("(%s?.+%s?)(%s)", quotesRegex, quotesRegex, config.GetCommentsRegex()))
 
+	key := strings.TrimSpace(split[0])
 	value := trimmedValue
 
 	if commentRegex != nil {
@@ -67,12 +69,14 @@ func getProperty(line string) (feature.Property, error) {
 		value = strings.TrimSpace(commentRegex[1][:len(commentRegex[1])-1])
 	}
 
-	property.SetValue(removeQuotes(value))
+	value = removeQuotes(value, config)
+
+	property = feature.CreateProperty(key, value, seperator, config)
 
 	return property, nil
 }
 
-func removeQuotes(value string) string {
+func removeQuotes(value string, config config.Config) string {
 	var noQuotes string
 
 	for _, char := range config.GetQuotesChars() {
@@ -89,6 +93,43 @@ func removeQuotes(value string) string {
 	return noQuotes
 }
 
-func getFeaturePrefix(line string) string {
-	return utils.Match(line, "^[\\s]+")
+func getFeaturePrefix(line string, subType subsection.SubSectionType) string {
+	switch subType {
+	case subsection.Indented:
+		return utils.Match(line, `^[\s]+`)
+	case subsection.Seperated:
+		return utils.Match(line, `[^\[].*\.`)
+	}
+
+	log.Fatal("No subsection config specified")
+	return ""
+}
+
+func checkSectionLineDepth(line *string, currentSection *feature.Section, subType subsection.SubSectionType) int {
+	prefixLen := getPrefixLen(getFeaturePrefix(*line, subType), subType)
+	currentSectionPrefixLen := getPrefixLen(getFeaturePrefix(currentSection.Prefix, subType), subType)
+	if prefixLen > currentSectionPrefixLen {
+		return 1
+	}
+	if prefixLen == currentSectionPrefixLen {
+		return 0
+	}
+	if prefixLen < currentSectionPrefixLen {
+		return -1
+	}
+
+	log.Fatal("No subsection config specified")
+	return 0
+}
+
+func getPrefixLen(prefix string, subType subsection.SubSectionType) int {
+	switch subType {
+	case subsection.Indented:
+		return len(prefix)
+	case subsection.Seperated:
+		regex := regexp.MustCompile(`\.`)
+		return len(regex.FindAllStringIndex(prefix, -1))
+	}
+
+	return 0
 }
